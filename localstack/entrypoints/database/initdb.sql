@@ -1,0 +1,1 @@
+-- insira aqui o script para popular ou criar tabelas auxiliares

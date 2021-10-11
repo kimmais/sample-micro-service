@@ -1,0 +1,28 @@
+version: "3.1"
+services:
+  aws_local:
+    image: localstack/localstack
+    restart: always
+    environment:
+      SERVICES: secretsmanager
+      PORT_WEB_UI: 8081
+      START_WEB: 1
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+      - "5617:5617"
+      - "8081:8081"
+    volumes:
+      - "./entrypoints/tmp/localstack:/tmp/localstack"
+      - "./entrypoints/aws:/docker-entrypoint-initaws.d"
+  database:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "kame-hame-haaa"
+      POSTGRES_USER: "goku"
+      POSTGRES_DB: "kim"
+    ports:
+      - 5432:5432
+    volumes:
+      - "./entrypoints/database:/docker-entrypoint-initdb.d"

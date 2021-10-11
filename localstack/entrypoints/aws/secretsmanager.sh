@@ -1,0 +1,1 @@
+awslocal secretsmanager create-secret --name "secrets/kim/database/01" --description "Acesso ao banco de dados local postgres" --secret-string "{\"username\": \"goku\",\"password\": \"kame-hame-haaa\",\"engine\": \"postgres\",\"host\": \"localhost\",\"port\": 5432,\"dbInstanceIdentifier\": \"kim-database\",\"database\": \"kim\"}"
