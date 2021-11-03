@@ -1,9 +1,8 @@
 name: Deploy to Stage
 
 on:
-  pull_request:
-    branches: [ main ]
-    types: [closed]
+  release:
+    type: [published]
 
 jobs:
   deploy:
@@ -13,6 +12,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+    - name: Set Revision Version
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
     - name: Configura as credenciais da AWS
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -27,7 +29,7 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.APP_NAME }}
-        IMAGE_TAG: ${{ github.sha }}
+        IMAGE_TAG: ${{ steps.vars.outputs.tag }}
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
