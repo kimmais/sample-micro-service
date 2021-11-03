@@ -1,4 +1,4 @@
-name: Deploy to Production
+name: Deploy to Stage
 
 on:
   pull_request:
@@ -18,7 +18,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-2
+        aws-region: ${{ secrets.AWS_PRODUCTION_REGION }}
     - name: Realiza login na AWS
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
