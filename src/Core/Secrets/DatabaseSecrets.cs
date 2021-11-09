@@ -1,4 +1,6 @@
-﻿namespace Core.Secrets
+﻿using Core.Interfaces;
+
+namespace Core.Secrets
 {
     public class DatabaseSecrets : Secrets, IDatabaseSecrets
     {

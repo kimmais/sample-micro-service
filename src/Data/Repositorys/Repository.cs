@@ -1,6 +1,6 @@
 ﻿using Business.Interfaces.Repositorys;
 using Business.Models;
-using Data.Contexts;
+using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,9 +8,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Data.Repositorys
+namespace Infrastructure.Repositorys
 {
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity, new()
+    public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity, new()
     {
         protected readonly SampleContext Db;
         protected readonly DbSet<TEntity> DbSet;

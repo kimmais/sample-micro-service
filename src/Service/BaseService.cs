@@ -1,4 +1,5 @@
 ﻿using Business.Models;
+using Core.Interfaces;
 using Core.Notificacoes;
 using FluentValidation;
 using FluentValidation.Results;

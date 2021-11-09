@@ -1,7 +1,7 @@
-﻿using Core;
+﻿using Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data.Contexts
+namespace Infrastructure.Contexts
 {
     public class SampleContext : DbContext
     {

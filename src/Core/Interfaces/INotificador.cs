@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Core.Notificacoes;
+using System.Collections.Generic;
 
-namespace Core.Notificacoes
+namespace Core.Interfaces
 {
     public interface INotificador
     {

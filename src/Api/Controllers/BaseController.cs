@@ -1,4 +1,5 @@
-﻿using Core.Notificacoes;
+﻿using Core.Interfaces;
+using Core.Notificacoes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Linq;
