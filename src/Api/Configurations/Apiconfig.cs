@@ -1,7 +1,9 @@
 ﻿using Api.Configurations;
+using Api.Converters;
 using Core.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -21,9 +23,18 @@ namespace ApiConfiguration
 
                 o.Filters.Add(new AuthorizeFilter(policy));
             });
-            services.AddControllers();
-            services.AddHealthChecks();
 
+            services.AddControllers().AddJsonOptions(opts =>
+            {
+                opts.JsonSerializerOptions.Converters.Add(new CustomDateTimeConverter());
+                opts.JsonSerializerOptions.Converters.Add(new CustomIntConverter());
+                opts.JsonSerializerOptions.Converters.Add(new CustomLongConverter());
+                opts.JsonSerializerOptions.Converters.Add(new CustomShortConverter());
+                opts.JsonSerializerOptions.Converters.Add(new CustomDecimalConverter());
+                opts.JsonSerializerOptions.Converters.Add(new CustomGuidConverter());
+            });
+
+            services.AddHealthChecks();
 
             services.AddSwaggerGen(c =>
             {
@@ -66,7 +77,7 @@ namespace ApiConfiguration
             return services;
         }
 
-        public static IApplicationBuilder UseApiConfiguration(this IApplicationBuilder app)
+        public static IApplicationBuilder UseApiConfiguration(this IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseMigrations();
 
@@ -80,7 +91,8 @@ namespace ApiConfiguration
 
             app.UseCors("CorsPolicy");
 
-            app.UseSwagger();
+            if (env.EnvironmentName != "Testing")
+                app.UseSwagger();
 
             app.UseRouting();
 

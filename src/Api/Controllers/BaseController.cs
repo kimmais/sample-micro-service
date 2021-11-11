@@ -1,8 +1,10 @@
-﻿using Core.Interfaces;
+﻿using Business.Models;
+using Core.Interfaces;
 using Core.Notificacoes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Linq;
+using X.PagedList;
 
 namespace Api.Controllers
 {
@@ -27,10 +29,12 @@ namespace Api.Controllers
                 errors = _notificador.ObterNotificacoes().Select(n => n.Mensagem)
             });
         }
+
         protected IActionResult UpdatedResponse()
         {
             return Ok();
         }
+
         protected ActionResult CustomResponse(object result = null)
         {
             if (OperacaoValida())
@@ -50,10 +54,38 @@ namespace Api.Controllers
             if (!modelState.IsValid) NotificarErroModelInvalida(modelState);
             return CustomResponse();
         }
+
+        protected ActionResult CustomResponse<T>(IPagedList<T> list = null)
+        {
+            if (OperacaoValida())
+                return Ok(new PagedResponse<T>()
+                {
+                    PageNumber = list.PageNumber,
+                    TotalItens = list.TotalItemCount,
+                    TotalPages = list.PageCount,
+                    Data = list
+                });
+
+            return BadRequest(new
+            {
+                success = false,
+                errors = _notificador.ObterNotificacoes().Select(n => n.Mensagem)
+            });
+        }
+
+        protected ActionResult ErrorResponse(string message = null, string stackTrace = null)
+        {
+            if (message != null)
+                NotificarErro(message);
+
+            return Problem(detail: stackTrace, title: message);
+        }
+
         protected bool OperacaoValida()
         {
             return !_notificador.TemNotificacao();
         }
+
         protected void NotificarErroModelInvalida(ModelStateDictionary modelState)
         {
             var erros = modelState.Values.SelectMany(e => e.Errors);
@@ -63,6 +95,7 @@ namespace Api.Controllers
                 NotificarErro(errorMsg);
             }
         }
+
         protected void NotificarErro(string mensagem)
         {
             _notificador.Handle(new Notificacao(mensagem));

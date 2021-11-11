@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Service;
 using System;
 using System.Collections.Generic;
@@ -23,13 +24,15 @@ namespace Api.Configurations
             services.AddScoped<SampleContext>();
             services.AddScoped<INotificador, Notificador>();
 
-
             services.AddAutoMapper(new Assembly[] {
                 Assembly.Load("Api"),
+                Assembly.Load("Business")
             });
 
             RegisterSecrets(services);
+
             RegisterRepository(services);
+
             RegisterService(services);
         }
 
@@ -42,6 +45,15 @@ namespace Api.Configurations
                 var context = (DbContext)serviceScope.ServiceProvider.GetService(@class);
                 context.Database.Migrate();
             }
+        }
+
+        public static IServiceCollection AddLogger(this IServiceCollection services)
+        {
+            var serviceProvider = services.BuildServiceProvider();
+            var logger = serviceProvider.GetService<ILogger<Startup>>();
+            services.AddSingleton(typeof(ILogger), logger);
+
+            return services;
         }
 
         private static void RegisterSecrets(IServiceCollection services)
@@ -67,13 +79,10 @@ namespace Api.Configurations
             foreach (var @class in types)
             {
                 var @interfaces = @class.GetInterfaces();
+
                 foreach (var @interface in @interfaces)
-                {
                     if (@interface != null)
-                    {
                         injectFunc(@class, @interface);
-                    }
-                }
             }
         }
 
