@@ -1,4 +1,4 @@
-﻿using Business.Interfaces.Repositorys;
+﻿using Business.Interfaces.Repositories;
 using Core.Interfaces;
 using Core.Notificacoes;
 using Core.Secrets;
