@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using NetDevPack.Security.Jwt.AspNetCore;
+using System.Collections.Generic;
 
 namespace ApiConfiguration
 {
@@ -106,6 +107,13 @@ namespace ApiConfiguration
             });
 
             return app;
+        }
+
+        public static IApplicationBuilder UseSwaggerConfig(this IApplicationBuilder app, string baseRouter)
+        {
+            return app.UseSwagger(options =>
+                options.PreSerializeFilters.Add((swagger, httpReq) =>
+                    swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = baseRouter, Description = "Default" } }));
         }
     }
 }

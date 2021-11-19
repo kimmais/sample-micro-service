@@ -13,7 +13,13 @@ namespace Core.Secrets
 
         public Secrets()
         {
-            _manager = new AmazonSecretsManagerClient();
+#if DEBUG
+            var config = new AmazonSecretsManagerConfig()
+            { ServiceURL = "http://localhost:4566" };
+            _manager = new AmazonSecretsManagerClient(config);
+#else
+                _manager = new AmazonSecretsManagerClient();
+#endif
             _cache = new SecretsManagerCache(_manager);
         }
 

@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
+using System.Collections.Generic;
 
 namespace Api
 {
@@ -31,18 +33,23 @@ namespace Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
-            if (env.IsDevelopment() && env.EnvironmentName != "Testing")
+            string baseRouter = string.Empty;
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api v1"));
             }
-            else if (env.EnvironmentName != "Testing")
+            else
             {
-                app.UseExceptionHandler("/error");
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/v1/sample/swagger/v1/swagger.json", "Api v1"));
+                baseRouter = "/v1/sample/";
+                app.UseSwaggerUI(c => c.SwaggerEndpoint($"{baseRouter}swagger/v1/swagger.json", "Api v1"));
+
             }
 
+            app.UseSwaggerConfig(baseRouter);
             app.UseApiConfiguration(env);
         }
+
+       
     }
 }
