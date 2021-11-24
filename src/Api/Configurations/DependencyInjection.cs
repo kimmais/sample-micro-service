@@ -92,7 +92,7 @@ namespace Api.Configurations
         private static IEnumerable<Type> GetServiceClasses() => GetClasses("Service", "Service")
             .Where(type => type.IsAssignableTo(typeof(BaseService)));
 
-        private static IEnumerable<Type> GetRepositoryClasses() => GetClasses("Infrastructure", "Infrastructure.Repositorys")
+        private static IEnumerable<Type> GetRepositoryClasses() => GetClasses("Infrastructure", "Infrastructure.Repositories")
             .Where(type => type.GetInterfaces().Any(i => i.GetGenericTypeDefinition() == typeof(IRepository<>)));
 
         private static IEnumerable<Type> GetContextRepositoryClasses() => GetClasses("Infrastructure", "Infrastructure.Contexts")
