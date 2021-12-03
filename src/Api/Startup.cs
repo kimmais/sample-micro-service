@@ -1,11 +1,11 @@
 using Api.Configurations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace Api
 {
@@ -22,6 +22,21 @@ namespace Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc()
+            .ConfigureApiBehaviorOptions(opt =>
+            {
+                opt.InvalidModelStateResponseFactory =
+                    (context =>
+                    {
+                        return new BadRequestObjectResult(new
+                        {
+                            success = false,
+                            errors = context.ModelState.SelectMany(e => e.Value.Errors.Select(e => e.ErrorMessage))
+                        });
+                    });
+            });
+            services.AddSwagger();
+
             services.AddLogger();
 
             services.AddDependenciesResolver(_environment);
@@ -31,24 +46,21 @@ namespace Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
-            string baseRouter = string.Empty;
-            if (env.IsDevelopment())
+            if (env.EnvironmentName != "Testing")
             {
-                app.UseDeveloperExceptionPage();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api v1"));
+                var baseUrl = "";
+                if (env.IsDevelopment())
+                    app.UseDeveloperExceptionPage();
+                else
+                {
+                    app.UseExceptionHandler("/error");
+                    baseUrl = "/v1/sample";
+                }
+                app.UseSwaggerConfig(baseUrl);
+                app.UseSwaggerUI(c => c.SwaggerEndpoint(baseUrl + "/swagger/v1/swagger.json", "API v1"));
             }
-            else
-            {
-                baseRouter = "/v1/sample/";
-                app.UseSwaggerUI(c => c.SwaggerEndpoint($"{baseRouter}swagger/v1/swagger.json", "Api v1"));
 
-            }
-
-            app.UseSwaggerConfig(baseRouter);
-            app.UseApiConfiguration(env);
+            app.UseApiConfiguration();
         }
-
-       
     }
 }

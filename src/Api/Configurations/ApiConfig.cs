@@ -1,14 +1,13 @@
-﻿using Api.Configurations;
-using Api.Converters;
+﻿using Api.Converters;
 using Core.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
 using NetDevPack.Security.Jwt.AspNetCore;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Api.Configurations
 {
@@ -37,34 +36,7 @@ namespace Api.Configurations
 
             services.AddHealthChecks();
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Api", Version = "v1" });
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Description = "Insira o token JWT desta maneira: Bearer {seu token}",
-                    Name = "Authorization",
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey
-                });
-
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        System.Array.Empty<string>()
-                    }
-                });
-            });
+            services.AddLogging();
 
             services.AddJwtConfiguration();
 
@@ -78,7 +50,24 @@ namespace Api.Configurations
             return services;
         }
 
-        public static IApplicationBuilder UseApiConfiguration(this IApplicationBuilder app, IWebHostEnvironment env)
+        private static RequestLocalizationOptions GetLocalizationOptions()
+        {
+            var supportedCultures = new List<CultureInfo>
+            {
+                new CultureInfo("en-US"),
+                new CultureInfo("pt-BR"),
+            };
+            var options = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("en-US"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures,
+                ApplyCurrentCultureToResponseHeaders = true,
+            };
+            return options;
+        }
+
+        public static IApplicationBuilder UseApiConfiguration(this IApplicationBuilder app)
         {
             app.UseMigrations();
 
@@ -92,8 +81,7 @@ namespace Api.Configurations
 
             app.UseCors("CorsPolicy");
 
-            if (env.EnvironmentName != "Testing")
-                app.UseSwagger();
+            app.UseRequestLocalization(GetLocalizationOptions());
 
             app.UseRouting();
 
@@ -107,13 +95,6 @@ namespace Api.Configurations
             });
 
             return app;
-        }
-
-        public static IApplicationBuilder UseSwaggerConfig(this IApplicationBuilder app, string baseRouter)
-        {
-            return app.UseSwagger(options =>
-                options.PreSerializeFilters.Add((swagger, httpReq) =>
-                    swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = baseRouter, Description = "Default" } }));
         }
     }
 }
