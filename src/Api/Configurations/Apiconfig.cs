@@ -10,7 +10,7 @@ using Microsoft.OpenApi.Models;
 using NetDevPack.Security.Jwt.AspNetCore;
 using System.Collections.Generic;
 
-namespace ApiConfiguration
+namespace Api.Configurations
 {
     public static class ApiConfig
     {
