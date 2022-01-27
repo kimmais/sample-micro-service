@@ -10,8 +10,14 @@ namespace Api
     {
         public static void Main(string[] args)
         {
+            using var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddAWSProvider();
+                builder.AddConsole();
+            });
+            ILogger logger = loggerFactory.CreateLogger<Program>();
+
             var host = CreateHostBuilder(args).Build();
-            var logger = host.Services.GetRequiredService<ILogger>();
 
             try
             {
@@ -28,6 +34,7 @@ namespace Api
                 .ConfigureLogging(logging =>
                 {
                     logging.AddAWSProvider();
+                    logging.AddConsole();
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
